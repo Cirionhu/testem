@@ -3,7 +3,10 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import Pilots from './pages/Pilots'; 
 import Register from './pages/Register';
-import Login from './pages/Login'; // 1. ÚJ IMPORT A BEJELENTKEZÉSHEZ
+import Login from './pages/Login'; 
+import Booking from './pages/Booking';
+import Profile from './pages/Profile';
+import Track from './pages/Track';
 import './App.css'; 
 
 function App() {
@@ -16,14 +19,12 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/pilots" element={<Pilots />} />
           <Route path="/register" element={<Register />} /> 
-          
-          {/* 2. ÚJ ÚTVONAL A BEJELENTKEZÉSHEZ: */}
           <Route path="/login" element={<Login />} /> 
+          <Route path="/booking" element={<Booking />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/track" element={<Track />} />
           
-          {/* Később ide jöhet majd a: <Route path="/diagrams" element={<Diagrams />} /> */}
         </Routes>
-        
-        {/* Itt lehet egy Footer komponens is */}
       </div>
     </Router>
   );

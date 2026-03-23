@@ -1,30 +1,32 @@
 import { Link } from 'react-router-dom';
 
 function Header() {
-  // Megnézzük, hogy van-e elmentett felhasználó a böngésző memóriájában (localStorage)
   const user = JSON.parse(localStorage.getItem('user'));
 
-  // Kijelentkezés funkció: töröljük a memóriát és frissítjük az oldalt
   const handleLogout = () => {
     localStorage.removeItem('user');
-    window.location.reload(); // Frissítjük az oldalt, hogy a menü visszaálljon
+    window.location.reload();
   };
 
   return (
     <header id="header">
       <h1 id="logo">
-        <Link style={{ border: "none" }} to="/">F1 ACADÉMIA</Link>
+        <Link style={{ border: "none" }} to="/">F1 AKADÉMIA</Link>
       </h1>
       <nav id="nav">
         <ul>
           <li><Link to="/">Főoldal</Link></li>
           <li><Link to="/pilots">Pilóták</Link></li>
-          <li><Link to="/diagrams">Diagramok</Link></li>
+          <li><Link to="/diagrams">Statisztikák</Link></li>
+          <li><Link to="/track">A Pálya</Link></li>
 
-          {/* Kondicionális renderelés: Ha be van lépve a júzer */}
+         /* login esetén*/
           {user ? (
             <>
-              <li style={{ color: '#e44c65', fontWeight: '300' }}>Szia, {user.name}!</li>
+              <li><Link to="/booking">Időpontfoglalás</Link></li>
+              <li><Link to="/profile">Profilom</Link></li>
+              
+              <li style={{ color: '#e44c65', fontWeight: '300', marginLeft: '15px' }}>Szia, {user.name}!</li>
               <li>
                 <button 
                   onClick={handleLogout} 
@@ -36,7 +38,6 @@ function Header() {
               </li>
             </>
           ) : (
-            /* Ha nincs belépve senki */
             <>
               <li><Link to="/register">Regisztráció</Link></li>
               <li><Link to="/login" className="button primary">Bejelentkezés</Link></li>
