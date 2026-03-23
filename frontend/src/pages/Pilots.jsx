@@ -1,89 +1,91 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 function Pilots() {
-    const [pilots, setPilots] = useState([]);
-    const [newPilot, setNewPilot] = useState({ name: '', nationality: '', is_active: true });
+  const [pilots, setPilots] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-    // Pilóták betöltése
-    const fetchPilots = async () => {
-        const res = await axios.get('http://localhost:5000/api/pilots');
-        setPilots(res.data);
-    };
+  useEffect(() => {
+    fetchPilots();
+  }, []);
 
-    useEffect(() => { fetchPilots(); }, []);
+  const fetchPilots = async () => {
+    try {
+      setLoading(true);
+      setError('');
 
-    // Új pilóta beküldése
-    const handleAdd = async (e) => {
-        e.preventDefault();
-        await axios.post('http://localhost:5000/api/pilots', newPilot);
-        setNewPilot({ name: '', nationality: '', is_active: true });
-        fetchPilots(); // Lista frissítése
-    };
+      const res = await axios.get('http://localhost:5000/api/pilots');
+      setPilots(res.data);
+    } catch (err) {
+      console.error(err);
+      setError('Nem sikerült betölteni a pilótákat.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Törlés
-    const handleDelete = async (id) => {
-        if (window.confirm("Biztosan törölni akarod?")) {
-            await axios.delete(`http://localhost:5000/api/pilots/${id}`);
-            fetchPilots(); // Lista frissítése
-        }
-    };
+  // 👉 születési év kiszedése
+  const getBirthYear = (date) => {
+    if (!date) return '-';
+    return date.split('-')[0];
+  };
 
-    return (
-        <div id="main" className="wrapper style1">
-            <div className="container">
-                <header className="major">
-                    <h2>Pilóták kezelése</h2>
-                    <p>Adatok hozzáadása és törlése az adatbázisból.</p>
-                </header>
+  return (
+    <div className="page-container">
+      <h1>Pilóták</h1>
+      <p>Az adatbázis API-ból szinkronizált pilótákat jelenít meg.</p>
 
-                {/* ÚJ PILÓTA ŰRLAP */}
-                <section style={{marginBottom: '3em'}}>
-                    <form onSubmit={handleAdd}>
-                        <div className="row gtr-uniform">
-                            <div className="col-4 col-12-xsmall">
-                                <input type="text" placeholder="Név" value={newPilot.name}
-                                    onChange={(e) => setNewPilot({...newPilot, name: e.target.value})} required />
-                            </div>
-                            <div className="col-4 col-12-xsmall">
-                                <input type="text" placeholder="Nemzetiség" value={newPilot.nationality}
-                                    onChange={(e) => setNewPilot({...newPilot, nationality: e.target.value})} required />
-                            </div>
-                            <div className="col-4 col-12-xsmall">
-                                <ul className="actions">
-                                    <li><input type="submit" value="Hozzáadás" className="primary" /></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </form>
-                </section>
+      {loading && <p>Betöltés...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
 
-                {/* TÁBLÁZAT */}
-                <div className="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Név</th>
-                                <th>Nemzetiség</th>
-                                <th>Művelet</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {pilots.map(p => (
-                                <tr key={p.id}>
-                                    <td>{p.name}</td>
-                                    <td>{p.nationality}</td>
-                                    <td>
-                                        <button onClick={() => handleDelete(p.id)} className="button small">Törlés</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+      {!loading && !error && (
+        <div className="table-wrapper">
+          <table className="styled-table">
+            <thead>
+              <tr>
+                <th>Teljes név</th>
+                <th>Nemzetiség</th>
+                <th>Születési év</th>
+                <th>Státusz</th>
+                <th>Részletek</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pilots.length > 0 ? (
+                pilots.map((pilot) => (
+                  <tr key={pilot.id}>
+                    <td>{pilot.full_name}</td>
+                    <td>{pilot.nationality || '-'}</td>
+                    <td>{getBirthYear(pilot.date_of_birth)}</td>
+                    <td>{pilot.is_active ? 'Aktív' : 'Nem aktív'}</td>
+                    <td>
+                      {pilot.wiki_url ? (
+                        <a
+                          href={pilot.wiki_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="button small"
+                        >
+                          Bővebben
+                        </a>
+                      ) : (
+                        <span>-</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5">Nincs megjeleníthető pilóta.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-    );
+      )}
+    </div>
+  );
 }
 
 export default Pilots;
