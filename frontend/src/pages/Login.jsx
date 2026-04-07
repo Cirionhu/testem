@@ -2,37 +2,29 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function Register() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-  });
-  const [message, setMessage] = useState('');
+axios.defaults.withCredentials = true;
+
+function Login() {
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const res = await axios.post(
-        'http://localhost:5000/api/users/register',
-        formData
+        'http://localhost:5000/api/users/login',
+        formData,
+        { withCredentials: true }
       );
 
-      setMessage(res.data.message || 'Sikeres regisztráció!');
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-      });
+      localStorage.setItem('user', JSON.stringify(res.data.user));
 
-      alert('Sikeres regisztráció! Most már bejelentkezhetsz.');
-      navigate('/login');
+      alert('Üdvözlünk, ' + res.data.user.name + '!');
+      navigate('/');
+      window.location.reload();
     } catch (err) {
-      setMessage(
-        'Hiba történt: ' + (err.response?.data?.error || 'Ismeretlen hiba')
-      );
+      setError(err.response?.data?.error || 'Hiba történt!');
     }
   };
 
@@ -40,8 +32,8 @@ function Register() {
     <div id="main" className="wrapper">
       <div className="container">
         <header className="major">
-          <h2>Regisztráció</h2>
-          <p>Csatlakozz az F1 Akadémia közösségéhez!</p>
+          <h2>Bejelentkezés</h2>
+          <p>Lépj be a fiókodba a kezelőfelület eléréséhez.</p>
         </header>
 
         <section
@@ -49,25 +41,12 @@ function Register() {
           style={{ maxWidth: '500px', margin: '0 auto', padding: '2em' }}
         >
           <form onSubmit={handleSubmit}>
-            <label>Teljes név</label>
-            <input
-              type="text"
-              placeholder="Teljes neved"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              required
-            />
-
             <label>E-mail cím</label>
             <input
               type="email"
               placeholder="pelda@email.com"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
             />
 
@@ -76,33 +55,55 @@ function Register() {
               type="password"
               placeholder="••••••••"
               value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
             />
 
             <button type="submit" className="button primary">
-              Fiók létrehozása
+              Bejelentkezés
             </button>
           </form>
 
-          {message && (
+          {error && (
             <p
               style={{
-                marginTop: '1em',
+                color: '#e44c65',
                 textAlign: 'center',
-                color: message.startsWith('Hiba') ? '#e44c65' : '#4caf50',
+                marginTop: '1em',
                 fontWeight: 'bold',
               }}
             >
-              {message}
+              {error}
             </p>
           )}
+
+          <hr style={{ margin: '2em 0' }} />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <button
+              type="button"
+              className="button"
+              onClick={() => {
+                window.location.href = 'http://localhost:5000/api/auth/google';
+              }}
+            >
+              Bejelentkezés Google-lel
+            </button>
+
+            <button
+              type="button"
+              className="button"
+              onClick={() => {
+                window.location.href = 'http://localhost:5000/api/auth/facebook';
+              }}
+            >
+              Bejelentkezés Facebookkal
+            </button>
+          </div>
         </section>
       </div>
     </div>
   );
 }
 
-export default Register;
+export default Login;

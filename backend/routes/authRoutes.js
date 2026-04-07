@@ -18,10 +18,7 @@ router.get(
 );
 
 // FACEBOOK
-router.get(
-  '/facebook',
-  passport.authenticate('facebook', { scope: ['email'] })
-);
+router.get('/facebook', passport.authenticate('facebook'));
 
 router.get(
   '/facebook/callback',
@@ -31,15 +28,18 @@ router.get(
   })
 );
 
-// CURRENT USER
+// Bejelentkezett user lekérése
 router.get('/me', (req, res) => {
-  res.json(req.user || null);
-});
+  if (!req.user) {
+    return res.status(401).json({ error: 'Nincs bejelentkezve' });
+  }
 
-// LOGOUT
-router.get('/logout', (req, res) => {
-  req.logout(() => {
-    res.redirect('http://localhost:5173/login');
+  res.json({
+    id: req.user.id,
+    name: req.user.name,
+    email: req.user.email,
+    is_admin: req.user.is_admin,
+    profile_image: req.user.profile_image || null,
   });
 });
 
