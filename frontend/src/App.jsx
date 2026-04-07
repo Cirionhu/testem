@@ -1,9 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-
 import Header from './components/Header';
-import Loader from './components/Loader';
-
 import Home from './pages/Home';
 import Pilots from './pages/Pilots';
 import Standings from './pages/Standings';
@@ -13,23 +9,13 @@ import Login from './pages/Login';
 import Booking from './pages/Booking';
 import Profile from './pages/Profile';
 import Track from './pages/Track';
-
-import { setupAxiosInterceptors } from './utils/axiosConfig';
-import './App.css';
 import AuthSuccess from './pages/AuthSuccess';
+import './App.css';
+
 function App() {
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setupAxiosInterceptors(setLoading);
-  }, []);
-
   return (
     <Router>
-      {loading && <Loader />}
-
       <Header />
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/pilots" element={<Pilots />} />
@@ -39,8 +25,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/booking" element={<Booking />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/auth-success" element={<AuthSuccess />} />
         <Route path="/track" element={<Track />} />
+        <Route path="/auth-success" element={<AuthSuccess />} />
       </Routes>
     </Router>
   );

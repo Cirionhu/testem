@@ -2,99 +2,107 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// FONTOS: session miatt
-axios.defaults.withCredentials = true;
+function Register() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
+  const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
-function Login() {
-    const [formData, setFormData] = useState({ email: '', password: '' });
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await axios.post('http://localhost:5000/api/users/login', formData);
-            
-            // User mentése
-            localStorage.setItem('user', JSON.stringify(res.data.user));
-            
-            alert("Üdvözlünk, " + res.data.user.name + "!");
-            navigate('/');
-            window.location.reload();
-        } catch (err) {
-            setError(err.response?.data?.error || "Hiba történt!");
-        }
-    };
+    try {
+      const res = await axios.post(
+        'http://localhost:5000/api/users/register',
+        formData
+      );
 
-    return (
-        <div id="main" className="wrapper">
-            <div className="container">
-                <header className="major">
-                    <h2>Bejelentkezés</h2>
-                    <p>Lépj be a fiókodba a kezelőfelület eléréséhez.</p>
-                </header>
+      setMessage(res.data.message || 'Sikeres regisztráció!');
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+      });
 
-                <section className="glass-box" style={{ maxWidth: '500px', margin: '0 auto', padding: '2em' }}>
-                    
-                    {/* 🔐 NORMAL LOGIN */}
-                    <form onSubmit={handleSubmit}>
-                        <label>E-mail cím</label>
-                        <input 
-                            type="email" 
-                            placeholder="pelda@email.com" 
-                            value={formData.email}
-                            onChange={(e) => setFormData({...formData, email: e.target.value})} 
-                            required 
-                        />
+      alert('Sikeres regisztráció! Most már bejelentkezhetsz.');
+      navigate('/login');
+    } catch (err) {
+      setMessage(
+        'Hiba történt: ' + (err.response?.data?.error || 'Ismeretlen hiba')
+      );
+    }
+  };
 
-                        <label>Jelszó</label>
-                        <input 
-                            type="password" 
-                            placeholder="••••••••" 
-                            value={formData.password}
-                            onChange={(e) => setFormData({...formData, password: e.target.value})} 
-                            required 
-                        />
+  return (
+    <div id="main" className="wrapper">
+      <div className="container">
+        <header className="major">
+          <h2>Regisztráció</h2>
+          <p>Csatlakozz az F1 Akadémia közösségéhez!</p>
+        </header>
 
-                        <button type="submit" className="button primary">
-                            Bejelentkezés
-                        </button>
-                    </form>
+        <section
+          className="glass-box"
+          style={{ maxWidth: '500px', margin: '0 auto', padding: '2em' }}
+        >
+          <form onSubmit={handleSubmit}>
+            <label>Teljes név</label>
+            <input
+              type="text"
+              placeholder="Teljes neved"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              required
+            />
 
-                    {/* HIBA */}
-                    {error && (
-                        <p style={{ color: '#e44c65', textAlign: 'center', marginTop: '1em', fontWeight: 'bold' }}>
-                            {error}
-                        </p>
-                    )}
+            <label>E-mail cím</label>
+            <input
+              type="email"
+              placeholder="pelda@email.com"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              required
+            />
 
-                    {/* 🔥 SOCIAL LOGIN */}
-                    <hr style={{ margin: '2em 0' }} />
+            <label>Jelszó</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+              required
+            />
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        
-                        <button
-                            type="button"
-                            className="button"
-                            onClick={() => window.location.href = "http://localhost:5000/api/auth/google"}
-                        >
-                            Bejelentkezés Google-lel
-                        </button>
+            <button type="submit" className="button primary">
+              Fiók létrehozása
+            </button>
+          </form>
 
-                        <button
-                            type="button"
-                            className="button"
-                            onClick={() => window.location.href = "http://localhost:5000/api/auth/facebook"}
-                        >
-                            Bejelentkezés Facebookkal
-                        </button>
-
-                    </div>
-
-                </section>
-            </div>
-        </div>
-    );
+          {message && (
+            <p
+              style={{
+                marginTop: '1em',
+                textAlign: 'center',
+                color: message.startsWith('Hiba') ? '#e44c65' : '#4caf50',
+                fontWeight: 'bold',
+              }}
+            >
+              {message}
+            </p>
+          )}
+        </section>
+      </div>
+    </div>
+  );
 }
 
-export default Login;
+export default Register;

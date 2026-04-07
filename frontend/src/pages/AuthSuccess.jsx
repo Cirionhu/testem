@@ -33,7 +33,10 @@ function AuthSuccess() {
   return (
     <div className="wrapper">
       <div className="container">
-        <section className="glass-box" style={{ maxWidth: '500px', margin: '0 auto', padding: '2em', textAlign: 'center' }}>
+        <section
+          className="glass-box"
+          style={{ maxWidth: '500px', margin: '0 auto', padding: '2em', textAlign: 'center' }}
+        >
           <h2>Bejelentkezés folyamatban...</h2>
           <p>Kérlek várj egy pillanatot.</p>
         </section>

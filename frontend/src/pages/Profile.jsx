@@ -41,7 +41,10 @@ function Profile() {
     return (
       <div className="wrapper">
         <div className="container">
-          <section className="glass-box" style={{ maxWidth: '500px', margin: '0 auto', padding: '2em', textAlign: 'center' }}>
+          <section
+            className="glass-box"
+            style={{ maxWidth: '500px', margin: '0 auto', padding: '2em', textAlign: 'center' }}
+          >
             <h2>Profil</h2>
             <p>Nincs bejelentkezve.</p>
           </section>
@@ -53,7 +56,10 @@ function Profile() {
   return (
     <div className="wrapper">
       <div className="container">
-        <section className="glass-box" style={{ maxWidth: '600px', margin: '0 auto', padding: '2em' }}>
+        <section
+          className="glass-box"
+          style={{ maxWidth: '600px', margin: '0 auto', padding: '2em' }}
+        >
           <h2>Profil</h2>
           <p><strong>Név:</strong> {user.name}</p>
           <p><strong>Email:</strong> {user.email}</p>
