@@ -2,6 +2,9 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+// FONTOS: session miatt
+axios.defaults.withCredentials = true;
+
 function Login() {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
@@ -12,12 +15,12 @@ function Login() {
         try {
             const res = await axios.post('http://localhost:5000/api/users/login', formData);
             
-            // Felhasználó mentése a böngészőbe
+            // User mentése
             localStorage.setItem('user', JSON.stringify(res.data.user));
             
             alert("Üdvözlünk, " + res.data.user.name + "!");
-            navigate('/'); 
-            window.location.reload(); 
+            navigate('/');
+            window.location.reload();
         } catch (err) {
             setError(err.response?.data?.error || "Hiba történt!");
         }
@@ -30,7 +33,10 @@ function Login() {
                     <h2>Bejelentkezés</h2>
                     <p>Lépj be a fiókodba a kezelőfelület eléréséhez.</p>
                 </header>
+
                 <section className="glass-box" style={{ maxWidth: '500px', margin: '0 auto', padding: '2em' }}>
+                    
+                    {/* 🔐 NORMAL LOGIN */}
                     <form onSubmit={handleSubmit}>
                         <label>E-mail cím</label>
                         <input 
@@ -49,16 +55,42 @@ function Login() {
                             onChange={(e) => setFormData({...formData, password: e.target.value})} 
                             required 
                         />
+
                         <button type="submit" className="button primary">
                             Bejelentkezés
                         </button>
                     </form>
-                    
+
+                    {/* HIBA */}
                     {error && (
                         <p style={{ color: '#e44c65', textAlign: 'center', marginTop: '1em', fontWeight: 'bold' }}>
                             {error}
                         </p>
                     )}
+
+                    {/* 🔥 SOCIAL LOGIN */}
+                    <hr style={{ margin: '2em 0' }} />
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        
+                        <button
+                            type="button"
+                            className="button"
+                            onClick={() => window.location.href = "http://localhost:5000/api/auth/google"}
+                        >
+                            Bejelentkezés Google-lel
+                        </button>
+
+                        <button
+                            type="button"
+                            className="button"
+                            onClick={() => window.location.href = "http://localhost:5000/api/auth/facebook"}
+                        >
+                            Bejelentkezés Facebookkal
+                        </button>
+
+                    </div>
+
                 </section>
             </div>
         </div>

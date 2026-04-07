@@ -5,20 +5,21 @@ require('dotenv').config();
 
 const db = require('./models');
 
+const userRoutes = require('./routes/userRoutes');
 const driverRoutes = require('./routes/driverRoutes');
 const newsRoutes = require('./routes/newsRoutes');
 const syncRoutes = require('./routes/syncRoutes');
 
-const {
-  fullF1Sync,
-} = require('./services/f1SyncService');
-const {
-  syncF1News,
-} = require('./services/newsSyncService');
+const { fullF1Sync } = require('./services/f1SyncService');
+const { syncF1News } = require('./services/newsSyncService');
 
 const app = express();
-
-app.use(cors());
+const session = require('express-session');
+const passport = require('./config/passport');
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
@@ -30,12 +31,23 @@ app.get('/', (req, res) => {
   });
 });
 
+// EZ HIÁNYZOTT
+app.use('/api/users', userRoutes);
+
 app.use('/api/drivers', driverRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/sync', syncRoutes);
+app.use(session({
+  secret: 'secret123',
+  resave: false,
+  saveUninitialized: false,
+}));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use('/api/auth', require('./routes/authRoutes'));
 function registerCronJobs() {
-  // Minden nap 03:00-kor F1 sync
   cron.schedule('0 3 * * *', async () => {
     try {
       console.log('Automatikus F1 sync indult...');
@@ -46,7 +58,6 @@ function registerCronJobs() {
     }
   });
 
-  // Minden nap 04:00-kor news sync
   cron.schedule('0 4 * * *', async () => {
     try {
       console.log('Automatikus news sync indult...');

@@ -9,10 +9,6 @@ const DriverStanding = require('./DriverStanding');
 const ConstructorStanding = require('./ConstructorStanding');
 const NewsArticle = require('./NewsArticle');
 
-// =========================
-// KAPCSOLATOK
-// =========================
-
 // User -> CustomerProfile
 User.hasOne(CustomerProfile, {
   foreignKey: 'user_id',
